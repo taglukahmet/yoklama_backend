@@ -1,0 +1,83 @@
+import os
+import sys
+import django
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
+sys.path.append(BASE_DIR)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'yoklama_backend.settings')
+django.setup()
+
+import requests
+from bs4 import BeautifulSoup
+from lecturer_data.models import University, Faculty, Department
+
+url = "https://yokatlas.yok.gov.tr/lisans-univ.php?u=1101"
+
+headers = {
+    "User-Agent": "Chrome/138.0.7204.159"
+}
+
+response = requests.get(url, headers=headers)
+soup = BeautifulSoup(response.text, "html.parser")
+
+panels = soup.select('#bs-collapse .panel.panel-primary')
+panels2 = soup.select('#bs-collapse2 .panel.panel-primary')
+unipanel = soup.select_one('div.page-header h3')
+if unipanel:
+    uni = unipanel.find(string = True, recursive=False).strip().title()
+uni = University.objects.create(name = f"{uni}")
+print(f"{uni} created")
+depts = []
+facs = []
+
+for panel in panels:
+    faculty_el = panel.select_one("div.panel-heading h4.panel-title a small font")
+    if faculty_el:
+        faculty_name = faculty_el.text.strip("()")
+    dept_el = panel.select_one("div.panel-heading h4.panel-title a div")
+    if dept_el: 
+        dept_name = dept_el.text 
+        if dept_name.find("KKTC Uyruklu") >=0:
+            continue
+    if faculty_name and dept_name:
+        depts.append({f"{faculty_name}":f"{dept_name}"})
+for panel in panels2:
+    faculty_el = panel.select_one("div.panel-heading h4.panel-title a small font")
+    if faculty_el:
+        faculty_name = faculty_el.text.strip("()")
+    dept_el = panel.select_one("div.panel-heading h4.panel-title a div")
+    if dept_el: 
+        dept_name = dept_el.text
+        if dept_name.find("KKTC Uyruklu") >=0:
+            continue
+    if faculty_name and dept_name:
+        depts.append({f"{faculty_name}":f"{dept_name}"})
+
+for dept in depts:
+    for value in dept.values():
+        cnt = 0
+        if value.find("(İngilizce)") >= 0: 
+            val = value
+            val = val.replace("(İngilizce)", "").strip()
+            for valu in dept.values():
+                if valu.find(f"{val}") >=0 and valu.find("(İnglizce)") < 0:
+                    cnt = 1
+            if cnt == 0:
+                for key in dept.keys():
+                    dept.update({f"{key}" : f"{val}"})
+
+
+for dept in depts:
+    for key in dept.keys():
+        if key not in facs:
+            facs.append(key)
+            facult = Faculty.objects.create(name = f"{key}", university = uni)
+            print(f"{facult} created on {uni}")
+            
+
+for dept in depts:
+    for key in dept.keys():
+        for value in dept.values():
+            facultt = Faculty.objects.get(name = f"{key}", university = uni)
+            depart = Department.objects.create(name = f"{value}", faculty = facultt)
+            print(f"added {depart} | {facultt} to the {uni}")

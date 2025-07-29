@@ -1,0 +1,157 @@
+from rest_framework import serializers
+from .models import *
+
+
+#for fetching the uni names for sign ups
+class UniversitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = University
+        fields = ('id','name')
+
+#for fetching the faculty names for sign ups
+class FacultySerializer(serializers.ModelSerializer):
+    university = UniversitySerializer(read_only=True)
+    class Meta:
+        model = Faculty
+        fields = ('id','name', 'university')
+
+#for fetching the dept names for sign ups
+class DepartmentSerializer(serializers.ModelSerializer):
+    faculty = FacultySerializer(read_only=True)
+    class Meta:
+        model = Department
+        fields = ('id', 'name', 'faculty')
+
+#for posting info to the lecturer on sign ups
+class LecturerSignUpSerializer(serializers.ModelSerializer):
+    department_id = serializers.UUIDField()
+    class Meta:
+        model = Lecturer
+        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'department_id', 'created_at')
+
+    def create(self, validated_data):
+        department_id = validated_data.pop('department_id')
+        department = Department.objects.get(id=department_id)
+        lecturer = Lecturer.objects.create(department=department, **validated_data)
+        return lecturer
+
+#for viewing and updating the lecturer in the profile page
+class LecturerProfileSerializer(serializers.ModelSerializer):
+    department_id = serializers.UUIDField(required=False)
+    class Meta:
+        model= Lecturer
+        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'department_id', 'phone', 'profile_photo', 'created_at')
+        read_only_fields = ('id', 'created_at')
+    def update(self, instance, validated_data):
+        department_id = validated_data.pop('department_id', None)
+        if department_id:
+            instance.department = Department.objects.get(id=department_id)
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.save()
+        return instance
+#for fetching the building for dropdown selects
+class BuildingSerializer(serializers.ModelSerializer):
+    department = DepartmentSerializer(read_only=True)
+    faculty = FacultySerializer(read_only=True)
+    university = UniversitySerializer(read_only=True)
+    class Meta: 
+        model = Building
+        fields = ('id', 'name', 'department', 'faculty', 'university')
+
+#for fetching the classroom for dropdown selects
+class ClassroomSerializer(serializers.ModelSerializer):
+    class_location = serializers.JSONField(required=False, read_only=True)
+    building = BuildingSerializer(read_only=True)
+    class Meta:
+        model = Classroom
+        fields = ('id', 'name', 'building', 'class_location')
+
+#for fetching the relevant Lecture details
+class LectureSerializer(serializers.ModelSerializer):
+    department = DepartmentSerializer(read_only=True)
+    class Meta:
+        model = Lecture
+        fields = ('id', 'name', 'code', 'explicit_name', 'department' )
+    
+#for fetching, posting, putting sections
+class SectionSerializer(serializers.ModelSerializer):
+    lecture_id = serializers.UUIDField(required=False)
+    lecture = LectureSerializer(read_only=True)
+    lecturer_id = serializers.UUIDField(required=False)
+    lecturer= LecturerProfileSerializer(read_only=True)
+    class Meta:
+        model = Section
+        fields = ('id', 'section_number', 'lecture_id', 'lecturer_id', 'lecture', 'lecturer')
+        read_only_fields=('id',)
+    def create(self, validated_data):
+        lecture_id = validated_data.pop('lecture_id', None)
+        lecture = Lecture.objects.get(id = lecture_id)
+        lecturer_id = validated_data.pop('lecturer_id', None)
+        lecturer = Lecturer.objects.get(id = lecturer_id)
+        section = Section.objects.create(lecture = lecture, lecturer = lecturer, **validated_data)
+        return section
+    def update(self, instance, validated_data):
+        lecturer_id = validated_data.pop('lecturer_id', None)
+        if lecturer_id:
+            instance.lecturer = Lecturer.objects.get(id=lecturer_id)
+        else: instance.lecturer = None
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+    def validate(self, data):
+        lecture_id = data.get('lecture_id') or getattr(self.instance, 'lecture', None)
+        section_number = data.get('section_number') or getattr(self.instance, 'section_number', None)
+        if lecture_id and section_number:
+            qs = Section.objects.filter(lecture=lecture_id, section_number=section_number)
+            if self.instance:
+                qs = qs.exclude(id = self.instance.id)
+            if qs.exists():
+                raise serializers.ValidationError(
+                    {"section_number": "This section is already taken"}
+                )
+        return data
+
+class HoursSerializer(serializers.ModelSerializer):
+    section_id = serializers.UUIDField(required=False)
+    section = SectionSerializer(read_only=True)
+    classroom_id = serializers.UUIDField(required=False)
+    classroom= ClassroomSerializer(read_only=True)
+    class Meta:
+        model = Hours
+        fields = ('id', 'order', 'day', 'time_start', 'time_end', 'section_id', 'classroom_id', 'section', 'classroom')
+        read_only_fields=('id',)
+    def create(self, validated_data):
+        section_id = validated_data.pop('section_id', None)
+        section = Section.objects.get(id = section_id)
+        classroom_id = validated_data.pop('classroom_id', None)
+        classroom = Classroom.objects.get(id = classroom_id)
+        hour = Hours.objects.create(section = section, classroom = classroom, **validated_data)
+        return hour
+    def update(self, instance, validated_data):
+        classroom_id = validated_data.pop('classroom_id', None)
+        if 'section' in validated_data:
+            raise serializers.ValidationError({"section": "You can't change the section"})
+        if classroom_id:
+            instance.classroom = Classroom.objects.get(id=classroom_id)
+        else: instance.classroom = None
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+    def validate(self, data):
+        section_id = data.get('section_id') or getattr(self.instance, 'section', None)
+        order = data.get('order') or getattr(self.instance, 'order', None)
+        if section_id and order:
+            qs = Hours.objects.filter(section = section_id, order = order)
+            if self.instance:
+                qs = qs.exclude(id = self.instance.id)
+            if qs.exists():
+                raise serializers.ValidationError(
+                    {"order": "This order already exists"}
+                )
+        return data
+
