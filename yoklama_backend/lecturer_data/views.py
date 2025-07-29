@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
 from .models import *
+from django.contrib.auth import authenticate, login, logout
 
 class UniversityListView(APIView):
     def get(self,request):
@@ -21,6 +22,31 @@ class DepartmentListView(APIView):
         departments = Department.objects.filter(faculty_id=faculty_id)
         serializer = DepartmentSerializer(departments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class LecturerLoginView(APIView):
+    def post(self,request):
+        # username = request.data.get('username') this place will be decided upon
+        email = request.data.get('email')
+        password = request.data.get('password')
+        try:
+            user = User.objects.get(username=email)
+        except User.DoesNotExist:
+            return Response({"detail":"Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None:
+            if hasattr(user, 'lecturer_profile'):
+                login(request, user)
+                return Response({"Message":"login successful"}, status=status.HTTP_200_OK)
+            return Response({"detail": "not a teacher account"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"detail": "invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+
+class LecturerLogoutView(APIView):
+    def post(self, request):
+        logout(request)
+        return Response({"message":"Logged out successfully"})
+
 
 class LecturerSignUpView(APIView):
     def post(self, request):

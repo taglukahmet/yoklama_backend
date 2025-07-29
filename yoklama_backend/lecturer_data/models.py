@@ -3,8 +3,8 @@ from django.utils import timezone
 from django.db.models import JSONField, Q
 import uuid
 from phonenumber_field.modelfields import PhoneNumberField
+from django.contrib.auth.models import User
 
-# Create your models here.
 
 class University(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -31,12 +31,12 @@ class Department(models.Model):
         return f"{self.name}"
 
 class Lecturer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='lecturer_profile')
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(default="", null=False, max_length=30)
     first_name = models.CharField(default="", null=False, max_length=100)
     last_name = models.CharField(default="", null=False, max_length=100) 
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name='lecturers')
-    email = models.EmailField(default="", null=False)
     phone = PhoneNumberField(null=True, blank=True, region='TR')
     profile_photo = models.ImageField(upload_to='lecturer_photos/', null=True, blank=True) 
     created_at = models.DateTimeField(auto_now_add=True)

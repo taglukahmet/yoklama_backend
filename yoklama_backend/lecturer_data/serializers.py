@@ -25,19 +25,29 @@ class DepartmentSerializer(serializers.ModelSerializer):
 #for posting info to the lecturer on sign ups
 class LecturerSignUpSerializer(serializers.ModelSerializer):
     department_id = serializers.UUIDField()
+    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True)
+
     class Meta:
         model = Lecturer
-        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'department_id', 'created_at')
+        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'department_id', 'password', 'created_at')
 
     def create(self, validated_data):
         department_id = validated_data.pop('department_id')
+        password = validated_data.pop('password')
         department = Department.objects.get(id=department_id)
-        lecturer = Lecturer.objects.create(department=department, **validated_data)
+        email = validated_data.pop('email')
+        if User.objects.filter(username__iexact=email).exists():
+            raise serializers.ValidationError({"email":"A user with this email already exists"})
+        user = User.objects.create_user(email=email, username=email, password=password)
+        lecturer = Lecturer.objects.create(user=user, department=department, **validated_data)
         return lecturer
 
 #for viewing and updating the lecturer in the profile page
 class LecturerProfileSerializer(serializers.ModelSerializer):
     department_id = serializers.UUIDField(required=False)
+    email = serializers.EmailField(write_only=True, required=False)
+
     class Meta:
         model= Lecturer
         fields = ('id', 'title', 'first_name', 'last_name', 'email', 'department_id', 'phone', 'profile_photo', 'created_at')
@@ -46,6 +56,10 @@ class LecturerProfileSerializer(serializers.ModelSerializer):
         department_id = validated_data.pop('department_id', None)
         if department_id:
             instance.department = Department.objects.get(id=department_id)
+        if 'email' in validated_data:
+            instance.user.email = validated_data['email']
+            instance.user.username = validated_data['email']
+            instance.user.save()
         
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

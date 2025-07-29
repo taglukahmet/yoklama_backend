@@ -14,6 +14,7 @@ urlpatterns = [
     path('sections/lecture/<uuid:lecture_id>/', SectionofLectureView.as_view(), name='get_post_sections_of_a_lecture'),
     path('sections/<uuid:section_id>/', SectiononlyView.as_view(), name='get_put_sections'),
     path('hours/section/<uuid:section_id>/', HoursofSectionView.as_view(), name='get_post_hours_of_a_section'),
-    path('hours/<uuid:hour_id>/', HouronlyView.as_view(), name='get_put_hours')
-
+    path('hours/<uuid:hour_id>/', HouronlyView.as_view(), name='get_put_hours'),
+    path('lecturers/login/', LecturerLoginView.as_view(), name='lecturer_login'),
+    path('lecturers/logout/', LecturerLogoutView.as_view(), name='lecturer_logout'),
 ]

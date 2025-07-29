@@ -114,6 +114,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# settings.py
+SESSION_COOKIE_NAME = "sessionid"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"  
+SESSION_COOKIE_SECURE = True     
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
