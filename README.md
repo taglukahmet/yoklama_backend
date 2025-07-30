@@ -31,3 +31,6 @@ also make sure that you edited the variables in accordance with your PostgreSQL 
    b. python manage.py migrate
 5. then run "python manage.py runserver" and you are goood to go.
 6. it will show you the localhost address, you will be using it for the frontend for local tests
+7. remember to run these important scripts to initiate the db
+   a. python scripts/scrape_static_unis.py
+   b. python scripts/create_new_db.py
