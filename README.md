@@ -18,6 +18,9 @@ here is a dependecies list, these are the critical ones that you should make sur
 
 also note that postgreSQL 17 is required due to some spesific lines in the codebase
 
+please download it from the official website, you can learn how to create a database from here https://youtu.be/KuQUNHCeKCk
+also make sure that you edited the variables in accordance with your PostgreSQL information in settings.py
+
 # how to run and use:
 
 1. open your terminal (whichever you use for python, I use anaconda prompt)
