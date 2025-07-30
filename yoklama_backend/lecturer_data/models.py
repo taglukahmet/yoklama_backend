@@ -71,7 +71,7 @@ class Section(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.lecture.full_name} Section-{self.section_number}"
+        return f"{self.lecture.name} {self.lecture.code} Section-{self.section_number}"
 
 class Building(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

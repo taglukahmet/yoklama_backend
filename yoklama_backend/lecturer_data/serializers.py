@@ -46,19 +46,22 @@ class LecturerSignUpSerializer(serializers.ModelSerializer):
 #for viewing and updating the lecturer in the profile page
 class LecturerProfileSerializer(serializers.ModelSerializer):
     department_id = serializers.UUIDField(required=False)
-    email = serializers.EmailField(write_only=True, required=False)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    email_update = serializers.EmailField(write_only=True, required=False)
+
 
     class Meta:
         model= Lecturer
-        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'department_id', 'phone', 'profile_photo', 'created_at')
+        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'email_update', 'department_id', 'phone', 'profile_photo', 'created_at')
         read_only_fields = ('id', 'created_at')
     def update(self, instance, validated_data):
         department_id = validated_data.pop('department_id', None)
         if department_id:
             instance.department = Department.objects.get(id=department_id)
-        if 'email' in validated_data:
-            instance.user.email = validated_data['email']
-            instance.user.username = validated_data['email']
+        if 'email_update' in validated_data:
+            email = validated_data.pop('email_update')
+            instance.user.email = email
+            instance.user.username = email
             instance.user.save()
         
         for attr, value in validated_data.items():

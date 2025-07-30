@@ -11,7 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 from lecturer_data.models import University, Faculty, Department
 
-url = "https://yokatlas.yok.gov.tr/lisans-univ.php?u=1101"
+url = "https://yokatlas.yok.gov.tr/lisans-univ.php?u=1084"
 
 headers = {
     "User-Agent": "Chrome/138.0.7204.159"
@@ -34,6 +34,8 @@ for panel in panels:
     faculty_el = panel.select_one("div.panel-heading h4.panel-title a small font")
     if faculty_el:
         faculty_name = faculty_el.text.strip("()")
+        if faculty_name.find("KKTC") >=0:
+            continue
     dept_el = panel.select_one("div.panel-heading h4.panel-title a div")
     if dept_el: 
         dept_name = dept_el.text 
@@ -45,6 +47,8 @@ for panel in panels2:
     faculty_el = panel.select_one("div.panel-heading h4.panel-title a small font")
     if faculty_el:
         faculty_name = faculty_el.text.strip("()")
+        if faculty_name.find("KKTC") >=0:
+            continue
     dept_el = panel.select_one("div.panel-heading h4.panel-title a div")
     if dept_el: 
         dept_name = dept_el.text

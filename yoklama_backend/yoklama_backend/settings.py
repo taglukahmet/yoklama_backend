@@ -87,11 +87,11 @@ WSGI_APPLICATION = 'yoklama_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'yoklama_db',
-        'USER': 'postgres',
-        'PASSWORD': 'H4.d4RB0b0.3',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': 'yoklama_db', #your db name
+        'USER': 'postgres', #your postgresql user, thats default
+        'PASSWORD': 'password', #your password
+        'HOST': 'localhost', #will change when deployed
+        'PORT': '5432', #default postgresql post
     }
 }
 
