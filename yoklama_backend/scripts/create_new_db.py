@@ -132,32 +132,32 @@ mail1="ucoluk@ceng.metu.edu.tr"
 pass1="ucoluk.1234"
 user1 = User.objects.create_user(username=mail1, email=mail1, password=pass1)
 lec1 = Lecturer.objects.create(user=user1, title="Prof. Dr.", first_name="Göktürk", last_name="Üçoluk", department=ceng)
-
+##############
 mail2="altingovde@ceng.metu.edu.tr"
 pass2="altingovde.1234"
 user2 = User.objects.create_user(username=mail2, email=mail2, password=pass2)
 lec2 = Lecturer.objects.create(user=user2, title="Prof. Dr.", first_name="İsmail Şengör", last_name="Altıngövde", department=ceng)
-
+##############
 mail3="onur@ceng.metu.edu.tr"
 pass3="onur.1234"
 user3 = User.objects.create_user(username=mail3, email=mail3, password=pass3)
 lec3 = Lecturer.objects.create(user=user3, title="Dr.", first_name="Onur Tolga", last_name="Şehitoğlu", department=ceng)
-
+##############
 mail4="toroslu@ceng.metu.edu.tr"
 pass4="toroslu.1234"
 user4 = User.objects.create_user(username=mail4, email=mail4, password=pass4)
 lec4 = Lecturer.objects.create(user=user4, title="Prof. Dr.", first_name="İsmail Hakkı", last_name="Toroslu", department=ceng)
-
+##############
 mail5="mangu@ceng.metu.edu.tr"
 pass5="mangu.1234"
 user5 = User.objects.create_user(username=mail5, email=mail5, password=pass5)
 lec5 = Lecturer.objects.create(user=user5, title="Prof. Dr.", first_name="Murathan", last_name="Manguoğlu", department=ceng)
-
+##############
 mail6="ertekin@ceng.metu.edu.tr"
 pass6="ertekin.1234"
 user6 = User.objects.create_user(username=mail6, email=mail6, password=pass6)
 lec6 = Lecturer.objects.create(user=user6, title="Assoc. Prof. Dr.", first_name="Şeyda", last_name="Ertekin", department=ceng)
-
+##############
 mail7="karagoz@ceng.metu.edu.tr"
 pass7="karagoz.1234"
 user7 = User.objects.create_user(username=mail7, email=mail7, password=pass7)
@@ -169,16 +169,16 @@ lec7 = Lecturer.objects.create(user=user7, title="Prof. Dr.", first_name="Pınar
 ceng140_1 = Section.objects.create(section_number="1", lecture=ceng140, lecturer=lec2)
 ceng140_2 = Section.objects.create(section_number="2", lecture=ceng140, lecturer=lec2)
 ceng140_3 = Section.objects.create(section_number="3", lecture=ceng140, lecturer=lec1)
-
+##############
 ceng242_1 = Section.objects.create(section_number="1", lecture=ceng242, lecturer=lec3)
 ceng242_2 = Section.objects.create(section_number="2", lecture=ceng242, lecturer=lec4)
-
+##############
 ceng232_1 = Section.objects.create(section_number="1", lecture=ceng232, lecturer=lec5)
 ceng232_2 = Section.objects.create(section_number="2", lecture=ceng232, lecturer=lec5)
-
+##############
 ceng222_1 = Section.objects.create(section_number="1", lecture=ceng222, lecturer=lec6)
 ceng222_2 = Section.objects.create(section_number="2", lecture=ceng222, lecturer=lec7)
-
+##############
 ceng213_1 = Section.objects.create(section_number="1", lecture=ceng213, lecturer=lec3)
 ceng213_2 = Section.objects.create(section_number="2", lecture=ceng213, lecturer=lec6)
 ceng213_3 = Section.objects.create(section_number="3", lecture=ceng213, lecturer=lec5)
@@ -195,7 +195,7 @@ ceng_140_1_3 = Hours.objects.create(day = "Tuesday", order="3", time_start="14:4
 ceng_140_2_1 = Hours.objects.create(day = "Monday", order="1", time_start="13:40", time_end="14:30", section= ceng140_2, classroom=cenga3)
 ceng_140_2_2 = Hours.objects.create(day = "Friday", order="2", time_start="13:40", time_end="14:30", section= ceng140_2, classroom=cenga3)
 ceng_140_2_3 = Hours.objects.create(day = "Friday", order="3", time_start="14:40", time_end="15:30", section= ceng140_2, classroom=cenga3)
-
+##############
 ceng_242_1_1 = Hours.objects.create(day = "Tuesday", order="1", time_start="09:40", time_end="10:30", section= ceng242_1, classroom=cenga1)
 ceng_242_1_2 = Hours.objects.create(day = "Wednesday", order="2", time_start="10:40", time_end="11:30", section= ceng242_1, classroom=cenga1)
 ceng_242_1_3 = Hours.objects.create(day = "Wednesday", order="3", time_start="11:40", time_end="12:30", section= ceng242_1, classroom=cenga1)
@@ -203,7 +203,7 @@ ceng_242_1_3 = Hours.objects.create(day = "Wednesday", order="3", time_start="11
 ceng_242_2_1 = Hours.objects.create(day = "Monday", order="1", time_start="08:40", time_end="09:30", section= ceng242_2, classroom=cenga3)
 ceng_242_2_2 = Hours.objects.create(day = "Monday", order="2", time_start="09:40", time_end="10:30", section= ceng242_2, classroom=cenga3)
 ceng_242_2_3 = Hours.objects.create(day = "Thursday", order="3", time_start="09:40", time_end="10:30", section= ceng242_2, classroom=cenga3)
-
+##############
 ceng_232_1_1 = Hours.objects.create(day = "Monday", order="1", time_start="10:40", time_end="11:30", section= ceng232_1, classroom=cenga1)
 ceng_232_1_2 = Hours.objects.create(day = "Monday", order="2", time_start="11:40", time_end="12:30", section= ceng232_1, classroom=cenga1)
 ceng_232_1_3 = Hours.objects.create(day = "Wednesday", order="3", time_start="12:40", time_end="13:30", section= ceng232_1, classroom=cenga1)
@@ -211,7 +211,7 @@ ceng_232_1_3 = Hours.objects.create(day = "Wednesday", order="3", time_start="12
 ceng_232_2_1 = Hours.objects.create(day = "Monday", order="1", time_start="13:40", time_end="14:30", section= ceng232_2, classroom=cenga2)
 ceng_232_2_2 = Hours.objects.create(day = "Monday", order="2", time_start="14:40", time_end="15:30", section= ceng232_2, classroom=cenga2)
 ceng_232_2_3 = Hours.objects.create(day = "Wednesday", order="3", time_start="16:40", time_end="17:30", section= ceng232_2, classroom=cenga2)
-
+##############
 ceng_222_1_1 = Hours.objects.create(day = "Monday", order="1", time_start="15:40", time_end="16:30", section= ceng222_1, classroom=cenga1)
 ceng_222_1_2 = Hours.objects.create(day = "Monday", order="2", time_start="16:40", time_end="17:30", section= ceng222_1, classroom=cenga1)
 ceng_222_1_3 = Hours.objects.create(day = "Wednesday", order="3", time_start="16:40", time_end="17:30", section= ceng222_1, classroom=cenga1)
@@ -219,4 +219,15 @@ ceng_222_1_3 = Hours.objects.create(day = "Wednesday", order="3", time_start="16
 ceng_222_2_1 = Hours.objects.create(day = "Tuesday", order="1", time_start="10:40", time_end="11:30", section= ceng222_2, classroom=cenga2)
 ceng_222_2_2 = Hours.objects.create(day = "Tuesday", order="2", time_start="11:40", time_end="12:30", section= ceng222_2, classroom=cenga2)
 ceng_222_2_3 = Hours.objects.create(day = "Friday", order="3", time_start="09:40", time_end="10:30", section= ceng222_2, classroom=cenga2)
+##############
+ceng_213_3_1 = Hours.objects.create(day = "Monday", order="1", time_start="15:40", time_end="16:30", section= ceng213_3, classroom=cengb1)
+ceng_213_3_2 = Hours.objects.create(day = "Thursday", order="2", time_start="10:40", time_end="11:30", section= ceng213_3, classroom=cengb1)
+ceng_213_3_3 = Hours.objects.create(day = "Thursday", order="3", time_start="11:40", time_end="12:30", section= ceng213_3, classroom=cengb1)
 
+ceng_213_1_1 = Hours.objects.create(day = "Monday", order="1", time_start="12:40", time_end="13:30", section= ceng213_1, classroom=cengb2)
+ceng_213_1_2 = Hours.objects.create(day = "Tuesday", order="2", time_start="13:40", time_end="14:30", section= ceng213_1, classroom=cengb2)
+ceng_213_1_3 = Hours.objects.create(day = "Tuesday", order="3", time_start="14:40", time_end="15:30", section= ceng213_1, classroom=cengb2)
+
+ceng_213_2_1 = Hours.objects.create(day = "Monday", order="1", time_start="13:40", time_end="14:30", section= ceng213_2, classroom=cengb2)
+ceng_213_2_2 = Hours.objects.create(day = "Friday", order="2", time_start="13:40", time_end="14:30", section= ceng213_2, classroom=cenga2)
+ceng_213_2_3 = Hours.objects.create(day = "Friday", order="3", time_start="14:40", time_end="15:30", section= ceng213_2, classroom=cenga2)
