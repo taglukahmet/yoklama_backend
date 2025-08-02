@@ -49,7 +49,6 @@ class LecturerProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', read_only=True)
     email_update = serializers.EmailField(write_only=True, required=False)
 
-
     class Meta:
         model= Lecturer
         fields = ('id', 'title', 'first_name', 'last_name', 'email', 'email_update', 'department_id', 'phone', 'profile_photo', 'created_at')

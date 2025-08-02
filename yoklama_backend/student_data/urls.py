@@ -1,7 +1,12 @@
 from django.urls import path
-from .views import StudentView
-
+from .views import *
+from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 
 urlpatterns = [
-    path('1', StudentView.as_view()),
+    path('students/department/<uuid:department_id>/', StudentofDepartmentView.as_view(), name='get_post_students_of_a_department'),
+    path('students/<uuid:student_id>/', StudentonlyView.as_view(), name='get_put_student'),
+    path('students/login/', TokenObtainPairView.as_view(), name='student_login'),
+    path('students/login/refresh', TokenRefreshView.as_view(), name='student_login_refresh')
+
+
 ]

@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 
 
 urlpatterns = [
@@ -15,6 +16,6 @@ urlpatterns = [
     path('sections/<uuid:section_id>/', SectiononlyView.as_view(), name='get_put_sections'),
     path('hours/section/<uuid:section_id>/', HoursofSectionView.as_view(), name='get_post_hours_of_a_section'),
     path('hours/<uuid:hour_id>/', HouronlyView.as_view(), name='get_put_hours'),
-    path('lecturers/login/', LecturerLoginView.as_view(), name='lecturer_login'),
-    path('lecturers/logout/', LecturerLogoutView.as_view(), name='lecturer_logout'),
+    path('lecturers/login/', TokenObtainPairView.as_view(), name='lecturer_login'),
+    path('lecturers/login/refresh', TokenRefreshView.as_view(), name='lecturer_login_refresh'),
 ]
