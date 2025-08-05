@@ -3,7 +3,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
 from .models import *
-from django.contrib.auth import authenticate, login, logout
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class UniversityListView(APIView):
     def get(self,request):

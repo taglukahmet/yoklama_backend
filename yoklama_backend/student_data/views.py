@@ -1,23 +1,27 @@
 from .serializers import *
 from .models import *
-from django.contrib.auth import authenticate, login, logout
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class StudentofDepartmentView(APIView):
-    def post(self, request, department_id):
-        serializer = StudentSerializer(data=request.data)
-        if serializer.is_valid():
-            student = serializer.save()
-            return Response(StudentSerializer(student).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def get(self, request, department_id):
         students = Student.objects.filter(department=department_id)
         if not students.exists():
             return Response({"detail": "No students found for this department."}, status=status.HTTP_404_NOT_FOUND)
         serializer = StudentSerializer(students, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    def post(self, request, department_id):
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            student = serializer.save()
+            return Response(StudentSerializer(student).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     
 class StudentonlyView(APIView):
     def get(self, request, student_id):

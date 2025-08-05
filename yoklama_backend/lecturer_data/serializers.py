@@ -1,5 +1,26 @@
 from rest_framework import serializers
 from .models import *
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        if hasattr(user, 'lecturer_profile'):
+            token['lecturer_id'] = str(user.lecturer_profile.id)
+
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        # Add lecturer_id to the response payload (not just in token)
+        if hasattr(self.user, 'lecturer_profile'):
+            data['lecturer_id'] = str(self.user.lecturer_profile.id)
+
+        return data
 
 
 #for fetching the uni names for sign ups
@@ -131,6 +152,7 @@ class SectionSerializer(serializers.ModelSerializer):
                 )
         return data
 
+#for fetching, posting and putting hours
 class HoursSerializer(serializers.ModelSerializer):
     section_id = serializers.UUIDField(required=False)
     section = SectionSerializer(read_only=True)

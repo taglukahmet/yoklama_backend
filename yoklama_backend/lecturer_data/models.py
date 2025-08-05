@@ -5,7 +5,10 @@ import uuid
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import User
 
+# For every model we use UUID, then we keep it clean, precise and unique
+# Order of data in the models are not important in here, its all the same
 
+# University and the academic calender info
 class University(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name= models.CharField(default="", null=False, max_length=100, unique=True)
@@ -14,6 +17,7 @@ class University(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+# Faculty and university info with a Foreignkey
 class Faculty(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name= models.CharField(default="", null=False, max_length=100)
@@ -22,6 +26,7 @@ class Faculty(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+# Departmnent and faculty info with a Foreignkey
 class Department(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(default="", null=False, max_length=100)
@@ -30,25 +35,29 @@ class Department(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+# Lecturer info, conneted to the department with a Foreignkey and tied to a user with an OnetOnefield
 class Lecturer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='lecturer_profile')
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    title = models.CharField(default="", null=False, max_length=30)
-    first_name = models.CharField(default="", null=False, max_length=100)
-    last_name = models.CharField(default="", null=False, max_length=100) 
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name='lecturers')
+    title = models.CharField(default="", null=True, blank=True, max_length=30)
+    first_name = models.CharField(default="", null=True, blank=True, max_length=100)
+    last_name = models.CharField(default="", null=True, blank=True, max_length=100) 
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='lecturers')
     phone = PhoneNumberField(null=True, blank=True, region='TR')
     profile_photo = models.ImageField(upload_to='lecturer_photos/', null=True, blank=True) 
+    # Created_at may be used in the future, delete it if it remains redundant
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.title} {self.first_name} {self.last_name}"
 
+# Lecture info, connected to a department with a Foreignkey
 class Lecture(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(default="", null=False, max_length=6)
     code = models.CharField(default="", null=False, max_length=6)  
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='lectures')
+    # thats the actual name of the lecture
     explicit_name = models.CharField(default="", null=True, blank=True, max_length=100)
 
     class Meta: 
@@ -58,7 +67,8 @@ class Lecture(models.Model):
     
     def __str__(self):
         return f"{self.name} {self.code}"
-    
+
+# Section info, connected to a lecture and a lecturer with a Foreignkey
 class Section(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     section_number = models.CharField(default="", null=False, max_length=6)
@@ -73,6 +83,7 @@ class Section(models.Model):
     def __str__(self):
         return f"{self.lecture.name} {self.lecture.code} Section-{self.section_number}"
 
+# Building info, connected to a department with a Foreignkey, it doesnt have to be a department building therefore faculty and uni info also added
 class Building(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name= models.CharField(default="", null=False, max_length=100)
@@ -90,12 +101,14 @@ class Building(models.Model):
         elif self.faculty : return f"{self.faculty.name} {self.name}"
         else: return f"{self.name}"
 
+# Classroom info, connected to a building with a Foreignkey
 class Classroom(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name= models.CharField(default="", null=False, max_length=100)
     building= models.ForeignKey(Building, on_delete=models.CASCADE, related_name='classes')
+    # this location is for future use
     class_location= JSONField(default=dict, null=True, blank=True)
-
+    #these functions are for backend use, not for frontend
     def set_location(self, x, y):
         self.class_location = {"x": x, "y": y}
         self.save()
@@ -111,7 +124,9 @@ class Classroom(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+# Hour of a section's info, connected to a classroom and a section with a Foreignkey
 class Hours(models.Model):
+    # All the day options for consistency, they are duplicate, it must be one for the database one for the usage
     DAYS = [
         ('Monday', 'Monday'),
         ('Tuesday', 'Tuesday'),
@@ -121,8 +136,11 @@ class Hours(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # the day of the week
     day = models.CharField(default="", null=False, choices=DAYS)
+    # first, second maybe third hour of a section
     order = models.CharField(default="", max_length=2)
+    # the format is Hour:Minute:Seconds.miliseconds you can just enter 09:40 and it gets the rest
     time_start = models.TimeField()
     time_end = models.TimeField()
     section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='hours')

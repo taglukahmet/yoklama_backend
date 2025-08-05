@@ -8,6 +8,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'yoklama_backend.settings')
 django.setup()
 
 from lecturer_data.models import *
+from student_data.models import *
+from yoklama_data.models import *
 #uni - fac and departments
 uni = University.objects.get(name="Ortadoğu Teknik Üniverstesi")
 fac = Faculty.objects.get(name = "Mühendislik Fakültesi")
@@ -127,40 +129,38 @@ ceng280 = Lecture.objects.create(name="CENG", code="280", department=ceng, expli
 ceng300 = Lecture.objects.create(name="CENG", code="300", department=ceng, explicit_name="Summer Practice I")
 ceng301 = Lecture.objects.create(name="CENG", code="301", department=ceng, explicit_name="Algorithms and Data Structures")
 
+
+#global mail and password ends
+mail = "@ceng.metu.edu.tr"
+pas = ".1234"
+
 #lecturers
-mail1="ucoluk@ceng.metu.edu.tr"
-pass1="ucoluk.1234"
-user1 = User.objects.create_user(username=mail1, email=mail1, password=pass1)
+name1 = "ucoluk"
+user1 = User.objects.create_user(username=name1 + mail, email=name1 + mail, password=name1 + pas)
 lec1 = Lecturer.objects.create(user=user1, title="Prof. Dr.", first_name="Göktürk", last_name="Üçoluk", department=ceng)
 ##############
-mail2="altingovde@ceng.metu.edu.tr"
-pass2="altingovde.1234"
-user2 = User.objects.create_user(username=mail2, email=mail2, password=pass2)
+name2 = "altingovde"
+user2 = User.objects.create_user(username=name2 + mail, email=name2 + mail, password=name2 + pas)
 lec2 = Lecturer.objects.create(user=user2, title="Prof. Dr.", first_name="İsmail Şengör", last_name="Altıngövde", department=ceng)
 ##############
-mail3="onur@ceng.metu.edu.tr"
-pass3="onur.1234"
-user3 = User.objects.create_user(username=mail3, email=mail3, password=pass3)
+name3 = "onur"
+user3 = User.objects.create_user(username=name3 + mail, email=name3 + mail, password=name3 + pas)
 lec3 = Lecturer.objects.create(user=user3, title="Dr.", first_name="Onur Tolga", last_name="Şehitoğlu", department=ceng)
 ##############
-mail4="toroslu@ceng.metu.edu.tr"
-pass4="toroslu.1234"
-user4 = User.objects.create_user(username=mail4, email=mail4, password=pass4)
+name4 = "toroslu"
+user4 = User.objects.create_user(username=name4 + mail, email=name4 + mail, password=name4 + pas)
 lec4 = Lecturer.objects.create(user=user4, title="Prof. Dr.", first_name="İsmail Hakkı", last_name="Toroslu", department=ceng)
 ##############
-mail5="mangu@ceng.metu.edu.tr"
-pass5="mangu.1234"
-user5 = User.objects.create_user(username=mail5, email=mail5, password=pass5)
+name5 = "mangu"
+user5 = User.objects.create_user(username=name5 + mail, email=name5 + mail, password=name5 + pas)
 lec5 = Lecturer.objects.create(user=user5, title="Prof. Dr.", first_name="Murathan", last_name="Manguoğlu", department=ceng)
 ##############
-mail6="ertekin@ceng.metu.edu.tr"
-pass6="ertekin.1234"
-user6 = User.objects.create_user(username=mail6, email=mail6, password=pass6)
+name6 = "ertekin"
+user6 = User.objects.create_user(username=name6 + mail, email=name6 + mail, password=name6 + pas)
 lec6 = Lecturer.objects.create(user=user6, title="Assoc. Prof. Dr.", first_name="Şeyda", last_name="Ertekin", department=ceng)
 ##############
-mail7="karagoz@ceng.metu.edu.tr"
-pass7="karagoz.1234"
-user7 = User.objects.create_user(username=mail7, email=mail7, password=pass7)
+name7 = "karagoz"
+user7 = User.objects.create_user(username=name7 + mail, email=name7 + mail, password=name7 + pas)
 lec7 = Lecturer.objects.create(user=user7, title="Prof. Dr.", first_name="Pınar", last_name="Karagöz", department=ceng)
 
 
@@ -231,3 +231,105 @@ ceng_213_1_3 = Hours.objects.create(day = "Tuesday", order="3", time_start="14:4
 ceng_213_2_1 = Hours.objects.create(day = "Monday", order="1", time_start="13:40", time_end="14:30", section= ceng213_2, classroom=cengb2)
 ceng_213_2_2 = Hours.objects.create(day = "Friday", order="2", time_start="13:40", time_end="14:30", section= ceng213_2, classroom=cenga2)
 ceng_213_2_3 = Hours.objects.create(day = "Friday", order="3", time_start="14:40", time_end="15:30", section= ceng213_2, classroom=cenga2)
+
+#students
+name1 = "emiryildiz"
+user1 = User.objects.create_user(username=name1 + mail, email=name1 + mail, password=name1 + pas)
+stu1 = Student.objects.create(user=user1, first_name="Emir", last_name="Yıldız", department=ceng, year= "1", student_number = "2728080")
+##############
+name2 = "burakdemirtas"
+user2 = User.objects.create_user(username=name2 + mail, email=name2 + mail, password=name2 + pas)
+stu2 = Student.objects.create(user=user2, first_name="Burak", last_name="Demirtas", department=ceng, year= "2", student_number = "2728081")
+##############
+name3 = "keremakyuz"
+user3 = User.objects.create_user(username=name3 + mail, email=name3 + mail, password=name3 + pas)
+stu3 = Student.objects.create(user=user3, first_name="Kerem", last_name="Akyüz", department=ceng, year= "3", student_number = "2728082")
+##############
+name4 = "onurkocak"
+user4 = User.objects.create_user(username=name4 + mail, email=name4 + mail, password=name4 + pas)
+stu4 = Student.objects.create(user=user4, first_name="Onur", last_name="Koçak", department=ceng, year= "4", student_number = "2728083")
+##############
+name5 = "mehmetyilmaz"
+user5 = User.objects.create_user(username=name5 + mail, email=name5 + mail, password=name5 + pas)
+stu5 = Student.objects.create(user=user5, first_name="Mehmet", last_name="Yılmaz", department=ceng, year= "1", student_number = "2728084")
+##############
+name6 = "mehmetyilmaz1"
+user6 = User.objects.create_user(username=name6 + mail, email=name6 + mail, password=name6 + pas)
+stu6 = Student.objects.create(user=user6, first_name="Mehmet", last_name="Yılmaz", department=ceng, year= "2", student_number = "2728085")
+##############
+name7 = "mehmetyilmaz2"
+user7 = User.objects.create_user(username=name7 + mail, email=name7 + mail, password=name7 + pas)
+stu7 = Student.objects.create(user=user7, first_name="Mehmet", last_name="Yılmaz", department=ceng, year= "3", student_number = "2728086")
+##############
+name8 = "longname"
+user8 = User.objects.create_user(username=name8 + mail, email=name8 + mail, password=name8 + pas)
+stu8 = Student.objects.create(user=user8, first_name="Mohammad Mahmoud Raouf Shaker Farouq", last_name="bin Tareq Azez Maarouf", department=ceng, year= "4", student_number = "2728087")
+##############
+name01 = "elifsahin"
+user01 = User.objects.create_user(username=name1 + mail, email=name1 + mail, password=name1 + pas)
+stu01 = Student.objects.create(user=user01, first_name="Elif", last_name="Şahin", department=ceng, year= "1", student_number = "2728180")
+##############
+name02 = "elifsahin1"
+user02 = User.objects.create_user(username=name2 + mail, email=name2 + mail, password=name2 + pas)
+stu02 = Student.objects.create(user=user02, first_name="Elif", last_name="Şahin", department=ceng, year= "2", student_number = "2728181")
+##############
+name03 = "elifaydin"
+user03 = User.objects.create_user(username=name3 + mail, email=name3 + mail, password=name3 + pas)
+stu03 = Student.objects.create(user=user03, first_name="Elif", last_name="Aydın", department=ceng, year= "3", student_number = "2728182")
+##############
+name04 = "zeynepaydin"
+user04 = User.objects.create_user(username=name4 + mail, email=name4 + mail, password=name4 + pas)
+stu04 = Student.objects.create(user=user04, first_name="Zeynep", last_name="Aydın", department=ceng, year= "4", student_number = "2728183")
+##############
+name05 = "iremaksoy"
+user05 = User.objects.create_user(username=name5 + mail, email=name5 + mail, password=name5 + pas)
+stu05 = Student.objects.create(user=user05, first_name="İrem", last_name="Aksoy", department=ceng, year= "1", student_number = "2728184")
+##############
+name06 = "esrapolat"
+user06 = User.objects.create_user(username=name6 + mail, email=name6 + mail, password=name6 + pas)
+stu06 = Student.objects.create(user=user06, first_name="Esra", last_name="Polat", department=ceng, year= "2", student_number = "2728185")
+##############
+name07 = "ayseguldemir"
+user07 = User.objects.create_user(username=name7 + mail, email=name7 + mail, password=name7 + pas)
+stu07 = Student.objects.create(user=user07, first_name="Ayşegül", last_name="Demir", department=ceng, year= "3", student_number = "2728186")
+##############
+name08 = "melisaarslan"
+user08 = User.objects.create_user(username=name8 + mail, email=name8 + mail, password=name8 + pas)
+stu08 = Student.objects.create(user=user08, first_name="Melisa", last_name="Arslan", department=ceng, year= "4", student_number = "2728187")
+
+
+#student_list
+studentss = Student.objects.all()
+student_list = StudentList.objects.create(name="CENG-140 Section-3 yoklama listesi", section  = ceng140_3)
+student_list.students.set(studentss)
+student_list.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

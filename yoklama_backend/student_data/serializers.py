@@ -2,6 +2,27 @@ from rest_framework import serializers
 from .models import *
 from lecturer_data.serializers import DepartmentSerializer
 from lecturer_data.models import Department
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        if hasattr(user, 'student_profile'):
+            token['student_id'] = str(user.student_profile.id)
+
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        # Add lecturer_id to the response payload (not just in token)
+        if hasattr(self.user, 'student_profile'):
+            data['student_id'] = str(self.user.student_profile.id)
+
+        return data
 
 class StudentSerializer(serializers.ModelSerializer):
     department_id = serializers.UUIDField(required=False)

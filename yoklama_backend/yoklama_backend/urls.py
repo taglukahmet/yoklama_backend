@@ -23,6 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('lecturer_data/', include('lecturer_data.urls')),
     path('student_data/', include('student_data.urls')),
+    path('yoklama_data/', include('yoklama_data.urls')),
+
 ]
 
 if settings.DEBUG:
