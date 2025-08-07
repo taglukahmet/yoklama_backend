@@ -7,7 +7,6 @@ from student_data.serializers import StudentSerializer
 
 class StudentListSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
-    section = SectionSerializer(required=False, read_only = True)
     section_id = serializers.UUIDField(required=False)
     students = StudentSerializer(many=True, read_only=True)
     student_numbers = serializers.ListField(
@@ -15,7 +14,7 @@ class StudentListSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = StudentList
-        fields = ('id', 'name', 'section_id' ,'section', 'student_numbers' ,'students')
+        fields = ('id', 'name', 'section_id', 'student_numbers' ,'students')
         read_only_fields = ('id',)
     def create(self, validated_data):
         section_id = validated_data.pop('section_id', None)
@@ -49,19 +48,20 @@ class StudentListSerializer(serializers.ModelSerializer):
 class AttendanceListSerializer(serializers.ModelSerializer):
     student_list = StudentListSerializer(read_only = True)
     student_list_id = serializers.UUIDField(required = False)
-    hour = HoursSerializer(read_only = True)
     hour_id = serializers.UUIDField(required = False)
     class Meta:
         model = AttendanceList
-        fields = ('id', 'is_active', 'is_taken_rollcall', 'hour_id', 'hour' ,'student_list_id', 'student_list', 'created_at')
+        fields = ('id', 'is_active', 'is_taken_rollcall', 'hour_id', 'student_list', 'student_list_id', 'created_at')
         read_only_fields = ('id', 'created_at')
     def create(self, validated_data):
         hour_id = validated_data.pop('hour_id')
         hour = Hours.objects.get(id = hour_id)
         student_list_id = validated_data.pop('student_list_id', None)
         student_list = StudentList.objects.get(id = student_list_id)
-        attendace_list = AttendanceList.objects.create(hour = hour, student_list= student_list, **validated_data)
-        return attendace_list
+        attendance_list = AttendanceList.objects.create(hour = hour, student_list= student_list, **validated_data)
+        for student in student_list.students.all():
+            AttendanceRecord.objects.create(student=student, attendance_list=attendance_list, is_attended = False) 
+        return attendance_list
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -70,13 +70,12 @@ class AttendanceListSerializer(serializers.ModelSerializer):
         return instance
     
 class AttendanceRecordSerializer(serializers.ModelSerializer):
-    attendance_list = AttendanceListSerializer(read_only=True)
     attendance_list_id = serializers.UUIDField(required=False)
     student = StudentSerializer(read_only=True)
     student_id = serializers.UUIDField(required=False)
     class Meta:
         model = AttendanceRecord
-        fields = ('id', 'is_attended','student_id', 'student', 'attendance_list_id', 'attendance_list', 'created_at')
+        fields = ('id', 'is_attended', 'student_id', 'student', 'attendance_list_id', 'created_at')
         read_only_fields = ('id', 'created_at')
     def create(self, validated_data):
         attendance_list_id = validated_data.pop('attendance_list_id')

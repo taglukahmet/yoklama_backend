@@ -11,12 +11,12 @@ from lecturer_data.models import *
 from student_data.models import *
 from yoklama_data.models import *
 #uni - fac and departments
-uni = University.objects.get(name="Ortadoğu Teknik Üniverstesi")
+uni = University.objects.get(name="Orta Doğu Tekni̇k Üni̇versi̇tesi̇")
 fac = Faculty.objects.get(name = "Mühendislik Fakültesi")
 ceng = Department.objects.get(name = "Bilgisayar Mühendisliği")
 eee = Department.objects.get(name = "Elektrik-Elektronik Mühendisliği")
 me = Department.objects.get(name = "Makine Mühendisliği")
-mete = Department.objects.get(name = "Malzeme ve Metalurji Mühendisliği")
+mete = Department.objects.get(name = "Metalurji ve Malzeme Mühendisliği")
 enve = Department.objects.get(name = "Çevre Mühendisliği")
 ie = Department.objects.get(name = "Endüstri Mühendisliği")
 fde = Department.objects.get(name = "Gıda Mühendisliği")
@@ -266,35 +266,35 @@ user8 = User.objects.create_user(username=name8 + mail, email=name8 + mail, pass
 stu8 = Student.objects.create(user=user8, first_name="Mohammad Mahmoud Raouf Shaker Farouq", last_name="bin Tareq Azez Maarouf", department=ceng, year= "4", student_number = "2728087")
 ##############
 name01 = "elifsahin"
-user01 = User.objects.create_user(username=name1 + mail, email=name1 + mail, password=name1 + pas)
+user01 = User.objects.create_user(username=name01 + mail, email=name01 + mail, password=name01 + pas)
 stu01 = Student.objects.create(user=user01, first_name="Elif", last_name="Şahin", department=ceng, year= "1", student_number = "2728180")
 ##############
 name02 = "elifsahin1"
-user02 = User.objects.create_user(username=name2 + mail, email=name2 + mail, password=name2 + pas)
+user02 = User.objects.create_user(username=name02 + mail, email=name02 + mail, password=name02 + pas)
 stu02 = Student.objects.create(user=user02, first_name="Elif", last_name="Şahin", department=ceng, year= "2", student_number = "2728181")
 ##############
 name03 = "elifaydin"
-user03 = User.objects.create_user(username=name3 + mail, email=name3 + mail, password=name3 + pas)
+user03 = User.objects.create_user(username=name03 + mail, email=name03 + mail, password=name03 + pas)
 stu03 = Student.objects.create(user=user03, first_name="Elif", last_name="Aydın", department=ceng, year= "3", student_number = "2728182")
 ##############
 name04 = "zeynepaydin"
-user04 = User.objects.create_user(username=name4 + mail, email=name4 + mail, password=name4 + pas)
+user04 = User.objects.create_user(username=name04 + mail, email=name04 + mail, password=name04 + pas)
 stu04 = Student.objects.create(user=user04, first_name="Zeynep", last_name="Aydın", department=ceng, year= "4", student_number = "2728183")
 ##############
 name05 = "iremaksoy"
-user05 = User.objects.create_user(username=name5 + mail, email=name5 + mail, password=name5 + pas)
+user05 = User.objects.create_user(username=name05 + mail, email=name05 + mail, password=name05 + pas)
 stu05 = Student.objects.create(user=user05, first_name="İrem", last_name="Aksoy", department=ceng, year= "1", student_number = "2728184")
 ##############
 name06 = "esrapolat"
-user06 = User.objects.create_user(username=name6 + mail, email=name6 + mail, password=name6 + pas)
+user06 = User.objects.create_user(username=name06 + mail, email=name06 + mail, password=name06 + pas)
 stu06 = Student.objects.create(user=user06, first_name="Esra", last_name="Polat", department=ceng, year= "2", student_number = "2728185")
 ##############
 name07 = "ayseguldemir"
-user07 = User.objects.create_user(username=name7 + mail, email=name7 + mail, password=name7 + pas)
+user07 = User.objects.create_user(username=name07 + mail, email=name07 + mail, password=name07 + pas)
 stu07 = Student.objects.create(user=user07, first_name="Ayşegül", last_name="Demir", department=ceng, year= "3", student_number = "2728186")
 ##############
 name08 = "melisaarslan"
-user08 = User.objects.create_user(username=name8 + mail, email=name8 + mail, password=name8 + pas)
+user08 = User.objects.create_user(username=name08 + mail, email=name08 + mail, password=name08 + pas)
 stu08 = Student.objects.create(user=user08, first_name="Melisa", last_name="Arslan", department=ceng, year= "4", student_number = "2728187")
 
 
@@ -303,6 +303,19 @@ studentss = Student.objects.all()
 student_list = StudentList.objects.create(name="CENG-140 Section-3 yoklama listesi", section  = ceng140_3)
 student_list.students.set(studentss)
 student_list.save()
+
+student_list2 = StudentList.objects.create(name="CENG-242 Section-1 yoklama listesi", section  = ceng242_1)
+student_list2.students.set(studentss)
+student_list2.save()
+
+student_list3 = StudentList.objects.create(name="CENG-232 Section-1 yoklama listesi", section  = ceng232_1)
+student_list3.students.set(studentss)
+student_list3.save()
+
+student_list4 = StudentList.objects.create(name="CENG-222 Section-1 yoklama listesi", section  = ceng222_1)
+student_list4.students.set(studentss)
+student_list4.save()
+
 
 
 

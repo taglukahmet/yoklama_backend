@@ -58,17 +58,20 @@ for panel in panels2:
         depts.append({f"{faculty_name}":f"{dept_name}"})
 
 for dept in depts:
-    for value in dept.values():
-        cnt = 0
-        if value.find("(İngilizce)") >= 0: 
-            val = value
-            val = val.replace("(İngilizce)", "").strip()
-            for valu in dept.values():
-                if valu.find(f"{val}") >=0 and valu.find("(İnglizce)") < 0:
-                    cnt = 1
-            if cnt == 0:
-                for key in dept.keys():
-                    dept.update({f"{key}" : f"{val}"})
+    for key in dept.keys():
+        for value in dept.values():
+            if "(İngilizce)" in value:
+                val = value
+                val = val.replace("(İngilizce)", "").strip()
+                cnt = 0
+                for dep in depts:
+                    for valu in dep.values():
+                        if val in valu and len(val) == len(valu) and "(İngilizce)" not in valu:
+                            cnt = 1
+                            break
+                if cnt==0:
+                    dept.update({key:val})
+
 
 
 for dept in depts:

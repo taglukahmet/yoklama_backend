@@ -2,26 +2,19 @@ from rest_framework import serializers
 from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+#token lecturer_id inclusion
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
-        # Add custom claims
         if hasattr(user, 'lecturer_profile'):
             token['lecturer_id'] = str(user.lecturer_profile.id)
-
         return token
-
     def validate(self, attrs):
         data = super().validate(attrs)
-
-        # Add lecturer_id to the response payload (not just in token)
         if hasattr(self.user, 'lecturer_profile'):
             data['lecturer_id'] = str(self.user.lecturer_profile.id)
-
         return data
-
 
 #for fetching the uni names for sign ups
 class UniversitySerializer(serializers.ModelSerializer):
@@ -66,13 +59,14 @@ class LecturerSignUpSerializer(serializers.ModelSerializer):
 
 #for viewing and updating the lecturer in the profile page
 class LecturerProfileSerializer(serializers.ModelSerializer):
-    department_id = serializers.UUIDField(required=False)
+    department_id = serializers.UUIDField(write_only = True, required=False)
+    department_name = serializers.CharField(source='department.name',read_only = True)
     email = serializers.EmailField(source='user.email', read_only=True)
     email_update = serializers.EmailField(write_only=True, required=False)
 
     class Meta:
         model= Lecturer
-        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'email_update', 'department_id', 'phone', 'profile_photo', 'created_at')
+        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'email_update', 'department_id', 'department_name', 'phone', 'profile_photo', 'created_at')
         read_only_fields = ('id', 'created_at')
     def update(self, instance, validated_data):
         department_id = validated_data.pop('department_id', None)
@@ -89,39 +83,62 @@ class LecturerProfileSerializer(serializers.ModelSerializer):
         
         instance.save()
         return instance
+    
+#for fetching lectures of a lecturer
+################################################
+class LectureforLecturerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lecture
+        fields = ('id', 'name', 'code', 'explicit_name')
+class SectionforLecturerSerializer(serializers.ModelSerializer):
+    lecture = LectureforLecturerSerializer(read_only=True)
+    class Meta:
+        model = Section
+        fields = ('id', 'section_number', 'lecture')
+class LecturerLecturesSerializer(serializers.ModelSerializer):
+    sections = SectionforLecturerSerializer(many=True, read_only=True)
+    class Meta:
+        model = Lecturer
+        fields = ('id', 'sections')
+################################################
+
 #for fetching the building for dropdown selects
 class BuildingSerializer(serializers.ModelSerializer):
-    department = DepartmentSerializer(read_only=True)
-    faculty = FacultySerializer(read_only=True)
-    university = UniversitySerializer(read_only=True)
+    department_name = serializers.CharField(source='department.name',read_only=True)
+    department_id = serializers.UUIDField(required=False)
+    faculty_id = serializers.UUIDField(required=False)
+    university_id = serializers.UUIDField(required=False)
     class Meta: 
         model = Building
-        fields = ('id', 'name', 'department', 'faculty', 'university')
+        fields = ('id', 'department_name', 'name', 'department_id', 'faculty_id', 'university_id')
 
 #for fetching the classroom for dropdown selects
 class ClassroomSerializer(serializers.ModelSerializer):
     class_location = serializers.JSONField(required=False, read_only=True)
-    building = BuildingSerializer(read_only=True)
+    building_id = serializers.UUIDField(required=False)
     class Meta:
         model = Classroom
-        fields = ('id', 'name', 'building', 'class_location')
+        fields = ('id', 'name', 'building_id', 'class_location')
 
 #for fetching the relevant Lecture details
 class LectureSerializer(serializers.ModelSerializer):
-    department = DepartmentSerializer(read_only=True)
+    department_id = serializers.UUIDField(required=False)
     class Meta:
         model = Lecture
-        fields = ('id', 'name', 'code', 'explicit_name', 'department' )
+        fields = ('id', 'name', 'code', 'explicit_name', 'department_id' )
     
 #for fetching, posting, putting sections
 class SectionSerializer(serializers.ModelSerializer):
     lecture_id = serializers.UUIDField(required=False)
-    lecture = LectureSerializer(read_only=True)
+    lecture_name = serializers.CharField(source='lecture.name', read_only=True)
+    lecture_code = serializers.CharField(source='lecture.code', read_only=True)
     lecturer_id = serializers.UUIDField(required=False)
-    lecturer= LecturerProfileSerializer(read_only=True)
+    lecturer_title = serializers.CharField(source='lecturer.title', read_only=True)
+    lecturer_first_name = serializers.CharField(source='lecturer.first_name', read_only=True)
+    lecturer_last_name = serializers.CharField(source='lecturer.last_name', read_only=True)
     class Meta:
         model = Section
-        fields = ('id', 'section_number', 'lecture_id', 'lecturer_id', 'lecture', 'lecturer')
+        fields = ('id', 'lecture_name', 'lecture_code', 'section_number', 'lecture_id', 'lecturer_title', 'lecturer_first_name', 'lecturer_last_name', 'lecturer_id')
         read_only_fields=('id',)
     def create(self, validated_data):
         lecture_id = validated_data.pop('lecture_id', None)
@@ -155,12 +172,19 @@ class SectionSerializer(serializers.ModelSerializer):
 #for fetching, posting and putting hours
 class HoursSerializer(serializers.ModelSerializer):
     section_id = serializers.UUIDField(required=False)
-    section = SectionSerializer(read_only=True)
+    section_number = serializers.CharField(source='section.section_number', read_only=True)
+    lecture_name = serializers.CharField(source='section.lecture.name', read_only=True)
+    lecture_code = serializers.CharField(source='section.lecture.code', read_only=True)
     classroom_id = serializers.UUIDField(required=False)
-    classroom= ClassroomSerializer(read_only=True)
+    classroom_name = serializers.CharField(source='classroom.name', read_only=True)
+    building_name = serializers.CharField(source='classroom.building.name', read_only=True)
+    order = serializers.CharField(required=False)
+    day = serializers.CharField(required=False)
+    time_start = serializers.TimeField(required=False)
+    time_end = serializers.TimeField(required=False)
     class Meta:
         model = Hours
-        fields = ('id', 'order', 'day', 'time_start', 'time_end', 'section_id', 'classroom_id', 'section', 'classroom')
+        fields = ('id', 'lecture_name', 'lecture_code', 'section_number', 'order', 'day', 'time_start', 'time_end', 'building_name', 'classroom_name', 'section_id', 'classroom_id')
         read_only_fields=('id',)
     def create(self, validated_data):
         section_id = validated_data.pop('section_id', None)

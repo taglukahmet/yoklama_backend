@@ -5,27 +5,32 @@ from .serializers import *
 from .models import *
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+#token lecturer_id inclusion
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+#returns all universities
 class UniversityListView(APIView):
     def get(self,request):
         universities = University.objects.all()
         serializer = UniversitySerializer(universities, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+#returns faculties of a given university
 class FacultyListView(APIView):
     def get(self, request, university_id):
         faculties = Faculty.objects.filter(university_id=university_id)
         serializer = FacultySerializer(faculties, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+#returns departments of a given faculty
 class DepartmentListView(APIView):
     def get(self, request, faculty_id):
         departments = Department.objects.filter(faculty_id=faculty_id)
         serializer = DepartmentSerializer(departments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+#for lecturers to signup
 class LecturerSignUpView(APIView):
     def post(self, request):
         serializer = LecturerSignUpSerializer(data=request.data)
@@ -34,6 +39,7 @@ class LecturerSignUpView(APIView):
             return Response(LecturerSignUpSerializer(lecturer).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+#returns all info except password 
 class LecturerProfileView(APIView):
     def get(self, request, lecturer_id):
         try:
@@ -55,7 +61,8 @@ class LecturerProfileView(APIView):
             updated_lecturer = serializer.save()
             return Response(LecturerProfileSerializer(updated_lecturer).data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+#returns dept, fac, and uni ids if any alongside building info of a uni
 class BuildingView(APIView):
     def get(self, request, university_id):
         try:
@@ -65,7 +72,8 @@ class BuildingView(APIView):
             return Response({"detail": "University not found."}, status=status.HTTP_404_NOT_FOUND)
         serializer = BuildingSerializer(buildings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+#returns classrooms of a building, and classroom locations
 class ClassroomView(APIView):
     def get(self,request,building_id):
         classrooms = Classroom.objects.filter(building=building_id)
@@ -73,7 +81,8 @@ class ClassroomView(APIView):
             return Response({"detail":"No classrooms found for this building."}, status=status.HTTP_404_NOT_FOUND)
         serializer = ClassroomSerializer(classrooms, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+#returns the lectures of a given department
 class LectureView(APIView):
     def get(self,request,department_id):
         lectures = Lecture.objects.filter(department = department_id)
@@ -81,7 +90,18 @@ class LectureView(APIView):
             return Response({"detail": "No courses found for this department."}, status=status.HTTP_404_NOT_FOUND)
         serializer = LectureSerializer(lectures, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+#returns the lectures of a lecturer
+class LecturesofLecturerView(APIView):
+    def get(self,request,lecturer_id):
+        try:
+            lecturer = Lecturer.objects.get(id = lecturer_id)
+        except Lecturer.DoesNotExist:
+            return Response({"detail":"Lecturer not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = LecturerLecturesSerializer(lecturer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+#returns section info to  add one into the lecture   
 class SectionofLectureView(APIView):
     def get(self,request,lecture_id):
         sections = Section.objects.filter(lecture = lecture_id)
@@ -95,7 +115,8 @@ class SectionofLectureView(APIView):
             section = serializer.save()
             return Response(SectionSerializer(section).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+#returns section spesific info to edit    
 class SectiononlyView(APIView):
     def get(self,request,section_id):
         try:
@@ -114,7 +135,8 @@ class SectiononlyView(APIView):
             updated_section = serializer.save()
             return Response(SectionSerializer(updated_section).data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+#returns hours of sections to add
 class HoursofSectionView(APIView):
     def get(self,request,section_id):
         hours = Hours.objects.filter(section = section_id)
@@ -128,7 +150,8 @@ class HoursofSectionView(APIView):
             hour = serializer.save()
             return Response(HoursSerializer(hour).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+#returns hour spesific info to edit
 class HouronlyView(APIView):
     def get(self,request,hour_id):
         try:

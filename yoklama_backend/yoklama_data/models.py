@@ -16,7 +16,7 @@ class AttendanceList(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student_list = models.ForeignKey(StudentList, on_delete=models.CASCADE, related_name='attendance_lists')
     hour = models.ForeignKey(Hours, on_delete=models.CASCADE, related_name='attendance_lists')
-    is_active= models.BooleanField(default=False)
+    is_active= models.BooleanField(default=True)
     is_taken_rollcall= models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

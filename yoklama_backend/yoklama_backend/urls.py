@@ -24,6 +24,7 @@ urlpatterns = [
     path('lecturer_data/', include('lecturer_data.urls')),
     path('student_data/', include('student_data.urls')),
     path('yoklama_data/', include('yoklama_data.urls')),
+    path('qr/', include('qr_generation.urls')),
 
 ]
 
