@@ -5,8 +5,10 @@ from .serializers import *
 from .models import *
 from django.utils.dateparse import parse_date
 from datetime import datetime
+from rest_framework.permissions import IsAuthenticated
 
 class StudentListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request,section_id):
         try:
             student_list = StudentList.objects.get(section = section_id)
@@ -31,30 +33,25 @@ class StudentListView(APIView):
             return Response(StudentListSerializer(updated_student_list).data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class AttendanceListofHourView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, hour_id):
         date_str = request.query_params.get('date', None)
         filters = {'hour': hour_id}
-
         if date_str:
             try:
                 date = parse_date(date_str)
                 filters['created_at__date'] = date  # ← switched to created_at
             except Exception:
                 return Response({"detail": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             attendance_list = AttendanceList.objects.get(**filters)
         except AttendanceList.DoesNotExist:
             return Response({"detail": "List not found."}, status=status.HTTP_404_NOT_FOUND)
-
         serializer = AttendanceListSerializer(attendance_list)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
     def post(self, request, hour_id):
         date_str = request.query_params.get('date', None)
-
         if date_str:
             try:
                 date = parse_date(date_str)
@@ -69,23 +66,19 @@ class AttendanceListofHourView(APIView):
             attendance_list = serializer.save()
             return Response(AttendanceListSerializer(attendance_list).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     def put(self, request, hour_id):
         date_str = request.query_params.get('date', None)
         filters = {'hour': hour_id}
-
         if date_str:
             try:
                 date = parse_date(date_str)
                 filters['created_at__date'] = date  # ← switched to created_at
             except:
                 return Response({"detail": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             attendance_list = AttendanceList.objects.get(**filters)
         except AttendanceList.DoesNotExist:
             return Response({"detail": "List not found."}, status=status.HTTP_404_NOT_FOUND)
-
         serializer = AttendanceListSerializer(attendance_list, data=request.data)
         if serializer.is_valid():
             updated_attendance_list = serializer.save()
@@ -93,6 +86,7 @@ class AttendanceListofHourView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AttendanceListofStudentListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, student_list_id):
         attendance_lists = AttendanceList.objects.filter(student_list = student_list_id)
         if not attendance_lists.exists():
@@ -106,22 +100,9 @@ class AttendanceListofStudentListView(APIView):
             return Response(AttendanceListSerializer(attendance_list).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class AttendanceRecordofAttendanceListView(APIView):
-    def get(self, request, attendance_list_id):
-        attendance_records = AttendanceRecord.objects.filter(attendance_list = attendance_list_id)
-        if not attendance_records.exists():
-            return Response({"detail":"No attendance records found for this attendance list"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = AttendanceRecordSerializer(attendance_records, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    def post(self, request, attendance_list_id):
-        serializer = AttendanceRecordSerializer(data = request.data)
-        if serializer.is_valid():
-            attendance_record = serializer.save()
-            return Response(AttendanceRecordSerializer(attendance_record).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
-    
 class AttendanceRecordOnlyView(APIView):
-    def get(self, request,attendance_record_id):
+    permission_classes = [IsAuthenticated]
+    def get(self,request,attendance_record_id):
         try:
             attendance_record = AttendanceRecord.objects.get(id = attendance_record_id)
         except AttendanceRecord.DoesNotExist:

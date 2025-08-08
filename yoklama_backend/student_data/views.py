@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import IsAuthenticated
 
 #for student login, also returns student_id
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -11,6 +12,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 #students inside department
 class StudentofDepartmentView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, department_id):
         students = Student.objects.filter(department=department_id)
         if not students.exists():
@@ -26,6 +28,7 @@ class StudentofDepartmentView(APIView):
     
 #student spesific view    
 class StudentonlyView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, student_id):
         try:
             student = Student.objects.get(id = student_id)
@@ -46,6 +49,7 @@ class StudentonlyView(APIView):
 
 #returns students enrolled courses
 class StudentLecturesView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, student_id):
         try:
             student = Student.objects.get(id=student_id)

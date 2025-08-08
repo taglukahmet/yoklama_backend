@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from phonenumber_field.serializerfields import PhoneNumberField
 
 #token lecturer_id inclusion
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -27,7 +28,7 @@ class FacultySerializer(serializers.ModelSerializer):
     university = UniversitySerializer(read_only=True)
     class Meta:
         model = Faculty
-        fields = ('id','name', 'university')
+        fields = ('id', 'name', 'university')
 
 #for fetching the dept names for sign ups
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -37,43 +38,36 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'faculty')
 
 #for posting info to the lecturer on sign ups
-class LecturerSignUpSerializer(serializers.ModelSerializer):
-    department_id = serializers.UUIDField()
-    password = serializers.CharField(write_only=True)
-    email = serializers.EmailField(write_only=True)
-
+class LecturerSerializer(serializers.ModelSerializer):
+    department_id = serializers.UUIDField(write_only = True, required=False)
+    department_name = serializers.CharField(source='department.name',read_only = True)
+    faculty_name = serializers.CharField(source='department.faculty.name',read_only=True)
+    university_name = serializers.CharField(source='department.faculty.university.name',read_only=True)
+    password = serializers.CharField(write_only=True, required=False)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    email_send = serializers.EmailField(write_only=True, required=False)
+    phone = PhoneNumberField(required=False)
+    
     class Meta:
         model = Lecturer
-        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'department_id', 'password', 'created_at')
-
+        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'email_send', 'department_id', 'department_name', 'faculty_name', 'university_name', 'password', 'phone', 'profile_photo', 'created_at')
+        read_only_fields = ('id', 'created_at')
     def create(self, validated_data):
         department_id = validated_data.pop('department_id')
         password = validated_data.pop('password')
         department = Department.objects.get(id=department_id)
-        email = validated_data.pop('email')
-        if User.objects.filter(username__iexact=email).exists():
+        email_send = validated_data.pop('email_send')
+        if User.objects.filter(username__iexact=email_send).exists():
             raise serializers.ValidationError({"email":"A user with this email already exists"})
-        user = User.objects.create_user(email=email, username=email, password=password)
+        user = User.objects.create_user(email=email_send, username=email_send, password=password)
         lecturer = Lecturer.objects.create(user=user, department=department, **validated_data)
         return lecturer
-
-#for viewing and updating the lecturer in the profile page
-class LecturerProfileSerializer(serializers.ModelSerializer):
-    department_id = serializers.UUIDField(write_only = True, required=False)
-    department_name = serializers.CharField(source='department.name',read_only = True)
-    email = serializers.EmailField(source='user.email', read_only=True)
-    email_update = serializers.EmailField(write_only=True, required=False)
-
-    class Meta:
-        model= Lecturer
-        fields = ('id', 'title', 'first_name', 'last_name', 'email', 'email_update', 'department_id', 'department_name', 'phone', 'profile_photo', 'created_at')
-        read_only_fields = ('id', 'created_at')
     def update(self, instance, validated_data):
         department_id = validated_data.pop('department_id', None)
         if department_id:
             instance.department = Department.objects.get(id=department_id)
-        if 'email_update' in validated_data:
-            email = validated_data.pop('email_update')
+        if 'email_send' in validated_data:
+            email = validated_data.pop('email_send')
             instance.user.email = email
             instance.user.username = email
             instance.user.save()

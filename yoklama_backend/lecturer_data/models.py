@@ -44,6 +44,7 @@ class Lecturer(models.Model):
     last_name = models.CharField(default="", null=True, blank=True, max_length=100) 
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='lecturers')
     phone = PhoneNumberField(null=True, blank=True, region='TR')
+    #not really tested yet
     profile_photo = models.ImageField(upload_to='lecturer_photos/', null=True, blank=True) 
     # Created_at may be used in the future, delete it if it remains redundant
     created_at = models.DateTimeField(auto_now_add=True)
