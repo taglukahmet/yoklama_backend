@@ -5,10 +5,73 @@ from .serializers import *
 from .models import *
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
+from yoklama_backend.settings import API_CBU_DOMAIN, CBU_DOMAIN
+import requests
+from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken 
 
 #token lecturer_id inclusion
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+#cbu login view
+class CBUAPILoginView(APIView):
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if not username or not password:
+            return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # --- Domain Detection ---
+        # We only handle logins for the special university here.
+        # You would need another view for your local users.
+        try:
+            domain = username.split('@')[1]
+            if domain.lower() != CBU_DOMAIN:
+                return Response({'error': 'Invalid credentials or user domain.'}, status=status.HTTP_401_UNAUTHORIZED)
+        except IndexError:
+            return Response({'error': 'Invalid username format.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # --- 1. Authenticate against the external API ---
+        try:
+            payload = {'email': username, 'password': password}
+            response = requests.post(API_CBU_DOMAIN, data=payload)
+            response.raise_for_status() # Raises HTTPError for 4xx/5xx status codes
+            api_data = response.json()
+        except requests.RequestException:
+            # This catches network errors or a 401 Unauthorized from the API
+            return Response({'error': 'Invalid credentials provided by the university.'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        # --- 2. Process the API Response ---
+        # "do some thing on it" - Here you trim, clean, and structure the data.
+        processed_profile = {
+            'lecturer_id': hash(api_data.get('description') + api_data.get('cn')),
+            'email': api_data.get('mail'),
+            'first_name': api_data.get('givenname'),
+            'last_name': api_data.get('sn').capitalize(),
+            'TC': api_data.get('description'),
+            'department': api_data.get('department')
+            # Add any other fields you want to keep
+        }
+
+        # --- 3. Generate a Custom Token ---
+        # We create a token but DO NOT save a user to the database.
+        # The profile information itself becomes the payload of our token.
+        refresh = RefreshToken()
+        
+        # Add the unique, non-sensitive identifier to the token's payload.
+        # This is what we'll use to identify the user on subsequent requests.
+        refresh['email'] = processed_profile['mail']
+
+        # The final response now contains the tokens AND the separate profile object.
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'profile': processed_profile
+        }, status=status.HTTP_200_OK)
 
 #returns all universities
 class UniversityListView(APIView):

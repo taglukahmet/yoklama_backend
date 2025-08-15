@@ -75,6 +75,7 @@ class Section(models.Model):
     section_number = models.CharField(default="", null=False, max_length=6)
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='sections')
     lecturer = models.ForeignKey(Lecturer, on_delete=models.SET_NULL, null=True, blank = True, related_name='sections')
+    lecturer_tc = models.CharField(default="", null=True, blank=True)
     
     class Meta: 
         constraints = [

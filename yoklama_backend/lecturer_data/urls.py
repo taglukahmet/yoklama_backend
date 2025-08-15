@@ -18,5 +18,6 @@ urlpatterns = [
     path('hours/section/<uuid:section_id>/', HoursofSectionView.as_view(), name='get_post_hours_of_a_section'),
     path('hours/<uuid:hour_id>/', HouronlyView.as_view(), name='get_put_hours'),
     path('lecturers/login/', CustomTokenObtainPairView.as_view(), name='lecturer_login'),
+    path('lecturers/cbu/login/', CBUAPILoginView.as_view(), name='lecturer_login_cbu'),
     path('lecturers/login/refresh', TokenRefreshView.as_view(), name='lecturer_login_refresh'),
 ]

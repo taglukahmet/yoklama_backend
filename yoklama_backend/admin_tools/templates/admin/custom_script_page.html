@@ -1,0 +1,25 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+  <div class="module">
+    <h1>Run Script</h1>
+    
+    <!-- Form to select a university -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="button">Add University</button>
+    </form>
+
+    {% if added_data %}
+      <h2>Results</h2>
+      <ul>
+        {% for message in added_data %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endblock %}

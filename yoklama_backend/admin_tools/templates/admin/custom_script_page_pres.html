@@ -1,0 +1,50 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+  <div class="module">
+    <h1>Run Script</h1>
+    
+    <!-- Form to select a university -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="button">Add University</button>
+    </form>
+
+    {% if added_data %}
+      <h2>Results</h2>
+      <ul>
+        {% for message in added_data %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endblock %}
+
+
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools-items %}
+  {# This keeps the default "Add university" button #}
+  {{ block.super }} 
+  
+  {# --- Button for your FIRST script --- #}
+  <li>
+    <a href="{% url 'admin:run_licence_scraper' %}" class="addlink">
+      {% trans "Scrape Licence Data" %}
+    </a>
+  </li>
+
+  {# --- Button for your SECOND script --- #}
+  <li>
+    <a href="{% url 'admin:run_pre_licence_scraper' %}" class="addlink">
+      {% trans "Scrape Pre-Licence Data" %}
+    </a>
+  </li>
+{% endblock %}
+
+
