@@ -4,11 +4,12 @@ from rest_framework import status
 from .serializers import *
 from .models import *
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from yoklama_backend.settings import API_CBU_DOMAIN, CBU_DOMAIN
 import requests
 from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken 
+import hashlib
 
 #token lecturer_id inclusion
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -25,9 +26,6 @@ class CBUAPILoginView(APIView):
         if not username or not password:
             return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # --- Domain Detection ---
-        # We only handle logins for the special university here.
-        # You would need another view for your local users.
         try:
             domain = username.split('@')[1]
             if domain.lower() != CBU_DOMAIN:
@@ -35,38 +33,27 @@ class CBUAPILoginView(APIView):
         except IndexError:
             return Response({'error': 'Invalid username format.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # --- 1. Authenticate against the external API ---
-        try:
-            payload = {'email': username, 'password': password}
-            response = requests.post(API_CBU_DOMAIN, data=payload)
-            response.raise_for_status() # Raises HTTPError for 4xx/5xx status codes
-            api_data = response.json()
-        except requests.RequestException:
-            # This catches network errors or a 401 Unauthorized from the API
-            return Response({'error': 'Invalid credentials provided by the university.'}, status=status.HTTP_401_UNAUTHORIZED)
-            
-        # --- 2. Process the API Response ---
-        # "do some thing on it" - Here you trim, clean, and structure the data.
+        payload = {'username': username, 'password': password}
+
+        response = requests.request("POST", API_CBU_DOMAIN, data=payload)
+        responsed= response.json().get('user_data', {})
+
+        hashed0 = responsed.get('description')[0]
+        hashed1 = responsed.get('cn')[0]
+        hashed = hashed0 + hashed1
+        hashed_code = hashlib.sha256(hashed.encode('utf-8')).hexdigest()
         processed_profile = {
-            'lecturer_id': hash(api_data.get('description') + api_data.get('cn')),
-            'email': api_data.get('mail'),
-            'first_name': api_data.get('givenname'),
-            'last_name': api_data.get('sn').capitalize(),
-            'TC': api_data.get('description'),
-            'department': api_data.get('department')
-            # Add any other fields you want to keep
+            'lecturer_id': hashed_code,
+            'email': responsed.get('mail')[0],
+            'first_name': responsed.get('givenname')[0],
+            'last_name': responsed.get('sn')[0].capitalize(),
+            'TC': hashed0,
+            'department': responsed.get('department')[0]
         }
 
-        # --- 3. Generate a Custom Token ---
-        # We create a token but DO NOT save a user to the database.
-        # The profile information itself becomes the payload of our token.
         refresh = RefreshToken()
-        
-        # Add the unique, non-sensitive identifier to the token's payload.
-        # This is what we'll use to identify the user on subsequent requests.
-        refresh['email'] = processed_profile['mail']
+        refresh['email'] = processed_profile['email']
 
-        # The final response now contains the tokens AND the separate profile object.
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
@@ -168,6 +155,16 @@ class LecturesofLecturerView(APIView):
         except Lecturer.DoesNotExist:
             return Response({"detail":"Lecturer not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer = LecturerLecturesSerializer(lecturer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+#returns the lectures of a lecturer
+class CBULecturesofLecturerView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request,lecturer_tc):
+        sections = Section.objects.filter(lecturer_tc = lecturer_tc)
+        if not sections.exists():
+            return Response({"detail": "There are no sections for the Teacher or Teacher not Found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = CBUSectionforLecturerSerializer(sections, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 #returns section info to  add one into the lecture   

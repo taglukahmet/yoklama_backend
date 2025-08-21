@@ -10,6 +10,7 @@ urlpatterns = [
     path('lecturers/signup/', LecturerSignUpView.as_view(), name='lecturer_signup_post'),
     path('lecturers/<uuid:lecturer_id>/', LecturerProfileView.as_view(), name= 'lecturer_profile_view_edit'),
     path('lecturers/lectures/<uuid:lecturer_id>/', LecturesofLecturerView.as_view(), name='get_lectures_of_lecturer'),
+    path('lecturers/lectures/cbu/<str:lecturer_tc>/', CBULecturesofLecturerView.as_view(), name='get_lectures_of_lecturer_cbu'),
     path('buildings/<uuid:university_id>/', BuildingView.as_view(), name='get_buildings'),
     path('classrooms/<uuid:building_id>/', ClassroomView.as_view(), name='get_classrooms'),
     path('lectures/<uuid:department_id>/', LectureView.as_view(), name='get_lectures'),

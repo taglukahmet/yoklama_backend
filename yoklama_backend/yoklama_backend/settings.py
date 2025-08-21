@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-n3ip!m%7vc%--o*v42x3g41d(jjue*f8bf&63r8(fzda&b(vt4'
 
 #celal bayar API address
-API_CBU_DOMAIN = 'https://proje.mcbu.edu.tr/Portal/kampus.php'
+API_CBU_DOMAIN = 'http://proje.mcbu.edu.tr/Portal/kampus.php'
 CBU_DOMAIN = 'cbu.edu.tr'
 
 # SECURITY WARNING: don't run with debug turned on in production!

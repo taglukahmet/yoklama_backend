@@ -89,6 +89,11 @@ class SectionforLecturerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Section
         fields = ('id', 'section_number', 'lecture')
+class CBUSectionforLecturerSerializer(serializers.ModelSerializer):
+    lecture = LectureforLecturerSerializer(read_only=True)
+    class Meta:
+        model = Section
+        fields = ('id', 'section_number', 'lecture', 'lecturer_tc')
 class LecturerLecturesSerializer(serializers.ModelSerializer):
     sections = SectionforLecturerSerializer(many=True, read_only=True)
     class Meta:
